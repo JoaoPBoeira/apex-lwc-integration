@@ -3,7 +3,7 @@ public with sharing class UserService {
     @AuraEnabled
     public static List<UserDTO> getUsers() {
         try {
-            HttpResponse response = HttpClient.get('/api/users');
+            HttpResponse response = HttpClient.makeRequest('/api/users', '', 'GET');
 
             if (response.getStatusCode() == 200) {
                 Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
@@ -45,7 +45,7 @@ public with sharing class UserService {
             user.name = name;
             user.email = email;
             String body = JSON.serialize(user);
-            HttpResponse response = HttpClient.post('/api/users', body);
+            HttpResponse response = HttpClient.makeRequest('/api/users', body, 'POST');
 
             if (response.getStatusCode() == 201) {
                 Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
@@ -76,7 +76,7 @@ public with sharing class UserService {
             user.name = name;
             user.email = email;
             String body = JSON.serialize(user);
-            HttpResponse response = HttpClient.put('/api/users/' + userId, body);
+            HttpResponse response = HttpClient.makeRequest('/api/users/' + userId, body, 'PUT');
 
             if (response.getStatusCode() == 200) {
                 Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
@@ -98,7 +98,7 @@ public with sharing class UserService {
     @AuraEnabled
     public static void deleteUser(Integer userId) {
         try {
-            HttpResponse response = HttpClient.delet('/api/users/' + userId);
+            HttpResponse response = HttpClient.makeRequest('/api/users/' + userId, '', 'DELETE');
 
             if (response.getStatusCode() == 204) {
                 return;
