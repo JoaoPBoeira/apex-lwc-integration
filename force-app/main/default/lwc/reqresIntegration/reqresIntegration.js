@@ -7,24 +7,22 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class ReqresIntegration extends LightningElement {
     @track users = [];
+    @track filteredUsers = [];
+    @track searchTerm = '';
     @track errorMessage = '';
     @track debugMessage = 'Carregando usuários...';
     @track newUserName = '';
     @track newUserEmail = '';
     @track isEditing = false;
     @track editingUserId = null;
-    @track formTitle = 'Criar Novo Usuário';
-    @track formButtonLabel = 'Criar Usuário';
-    @track filteredUsers = [];
-    @track searchTerm = '';
+    @track showCreateForm = false;
 
     get hasFilteredUsers() {
         return this.filteredUsers && Array.isArray(this.filteredUsers) && this.filteredUsers.length > 0;
     }
 
     get hasUsers() {
-        const hasUsers = this.users && Array.isArray(this.users) && this.users.length > 0;
-        return hasUsers;
+        return this.users && Array.isArray(this.users) && this.users.length > 0;
     }
 
     connectedCallback() {
@@ -41,6 +39,7 @@ export default class ReqresIntegration extends LightningElement {
             console.error('Erro ao buscar usuários:', error);
             this.errorMessage = error.body ? error.body.message : 'Erro ao carregar usuários.';
             this.users = [];
+            this.filteredUsers = [];
             this.showToast('Erro', this.errorMessage, 'error');
         }
     }
@@ -63,13 +62,14 @@ export default class ReqresIntegration extends LightningElement {
 
     async handleCreate() {
         if (!this.newUserName || !this.newUserEmail) {
-            this.showToast('Erro', 'Nome e profissão são obrigatórios.', 'error');
+            this.showToast('Erro', 'Nome e email são obrigatórios.', 'error');
             return;
         }
         try {
             const newUser = await createUser({ name: this.newUserName, email: this.newUserEmail });
             this.users = [...this.users, newUser];
             this.resetForm();
+            this.showCreateForm = false;
             this.showToast('Sucesso', 'Usuário criado com sucesso!', 'success');
             await this.fetchUsers();
         } catch (error) {
@@ -79,7 +79,7 @@ export default class ReqresIntegration extends LightningElement {
 
     async handleUpdate() {
         if (!this.newUserName || !this.newUserEmail) {
-            this.showToast('Erro', 'Nome e profissão são obrigatórios.', 'error');
+            this.showToast('Erro', 'Nome e email são obrigatórios.', 'error');
             return;
         }
         try {
@@ -92,6 +92,7 @@ export default class ReqresIntegration extends LightningElement {
                 user.id === this.editingUserId ? updatedUser : user
             );
             this.resetForm();
+            this.isEditing = false;
             this.showToast('Sucesso', 'Usuário atualizado com sucesso!', 'success');
             await this.fetchUsers();
         } catch (error) {
@@ -119,23 +120,15 @@ export default class ReqresIntegration extends LightningElement {
             this.newUserEmail = user.email;
             this.isEditing = true;
             this.editingUserId = userId;
-            this.formTitle = 'Atualizar Usuário';
-            this.formButtonLabel = 'Atualizar Usuário';
+            this.showCreateForm = false;
         } else {
             this.showToast('Erro', 'Usuário não encontrado para edição.', 'error');
         }
     }
 
-    handleSubmit() {
-        if (this.isEditing) {
-            this.handleUpdate();
-        } else {
-            this.handleCreate();
-        }
-    }
-
     cancelEdit() {
         this.resetForm();
+        this.isEditing = false;
     }
 
     handleNameChange(event) {
@@ -151,8 +144,14 @@ export default class ReqresIntegration extends LightningElement {
         this.newUserEmail = '';
         this.isEditing = false;
         this.editingUserId = null;
-        this.formTitle = 'Criar Novo Usuário';
-        this.formButtonLabel = 'Criar Usuário';
+    }
+
+    toggleCreateForm() {
+        this.showCreateForm = !this.showCreateForm;
+        if (this.showCreateForm) {
+            this.isEditing = false;
+            this.resetForm();
+        }
     }
 
     showToast(title, message, variant) {

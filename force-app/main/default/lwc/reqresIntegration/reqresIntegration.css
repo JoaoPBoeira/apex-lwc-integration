@@ -1,0 +1,30 @@
+.slds-card-boundary {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slds-input-height {
+    height: 2.5rem;
+}
+
+.user-card {
+    transition: all 0.2s ease;
+}
+
+.user-card:hover {
+    background-color: #f3f3f3;
+}
+
+.slds-scrollable_x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 48rem) {
+    .slds-col {
+        padding: 0.5rem;
+    }
+    .user-card {
+        margin-bottom: 0.5rem;
+    }
+}

@@ -1,39 +1,138 @@
 <template>
-    <lightning-card title="Integração com ReqRes API">
-        <div class="slds-m-around_medium">
+    <lightning-card title="Integração com ReqRes API" class="slds-card-boundary">
+        <div class="slds-m-around_medium slds-p-bottom_medium slds-size_1-of-2">
             <lightning-input
                 type="search"
                 label="Pesquisar Usuários"
                 placeholder="Digite nome ou email..."
                 onchange={handleSearch}
+                class="slds-input-height"
             ></lightning-input>
         </div>
 
         <div class="slds-m-around_medium">
-            <h3>{formTitle}</h3>
-            <lightning-input label="Nome" value={newUserName} onchange={handleNameChange}></lightning-input>
-            <lightning-input label="Email" value={newUserEmail} onchange={handleEmailChange}></lightning-input>
-            <lightning-button label={formButtonLabel} onclick={handleSubmit} class="slds-m-top_small"></lightning-button>
+            <lightning-button
+                variant="brand"
+                label="Criar Novo Usuário"
+                onclick={toggleCreateForm}
+                class="slds-m-top_medium slds-m-bottom_medium"
+            ></lightning-button>
+
+            <template if:true={showCreateForm}>
+                <section class="slds-box slds-theme_default slds-p-around_medium slds-m-top_medium" role="region" aria-labelledby="create-user-section">
+                    <h3 id="create-user-section" class="slds-text-heading_small slds-m-bottom_small">Criar Novo Usuário</h3>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-2 slds-p-right_x-small">
+                            <lightning-input
+                                label="Nome"
+                                value={newUserName}
+                                onchange={handleNameChange}
+                                class="slds-m-bottom_small"
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Email"
+                                value={newUserEmail}
+                                onchange={handleEmailChange}
+                                class="slds-m-bottom_small"
+                            ></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <lightning-button
+                                variant="brand"
+                                label="Criar Usuário"
+                                onclick={handleCreate}
+                                class="slds-m-top_small"
+                            ></lightning-button>
+                            <lightning-button
+                                variant="neutral"
+                                label="Cancelar"
+                                onclick={toggleCreateForm}
+                                class="slds-m-top_small slds-m-left_x-small"
+                            ></lightning-button>
+                        </div>
+                    </div>
+                </section>
+            </template>
+
             <template if:true={isEditing}>
-                <lightning-button label="Cancelar" onclick={cancelEdit} class="slds-m-top_small slds-m-left_small"></lightning-button>
+                <section class="slds-box slds-theme_default slds-p-around_medium slds-m-top_medium" role="region" aria-labelledby="edit-user-section">
+                    <h3 id="edit-user-section" class="slds-text-heading_small slds-m-bottom_small">Editar Usuário</h3>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-2 slds-p-right_x-small">
+                            <lightning-input
+                                label="Nome"
+                                value={newUserName}
+                                onchange={handleNameChange}
+                                class="slds-m-bottom_small"
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Email"
+                                value={newUserEmail}
+                                onchange={handleEmailChange}
+                                class="slds-m-bottom_small"
+                            ></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <lightning-button
+                                variant="brand"
+                                label="Salvar Alterações"
+                                onclick={handleUpdate}
+                                class="slds-m-top_small"
+                            ></lightning-button>
+                            <lightning-button
+                                variant="neutral"
+                                label="Cancelar"
+                                onclick={cancelEdit}
+                                class="slds-m-top_small slds-m-left_x-small"
+                            ></lightning-button>
+                        </div>
+                    </div>
+                </section>
             </template>
         </div>
 
         <div class="slds-m-around_medium">
-            <h3>Lista de Usuários</h3>
+            <h3 class="slds-text-heading_small">Lista de Usuários</h3>
             <template if:true={hasFilteredUsers}>
-                <template for:each={filteredUsers} for:item="user">
-                    <div key={user.id} class="slds-box slds-m-bottom_small">
-                        <p><strong>Id:</strong> {user.id}</p>
-                        <p><strong>Nome:</strong> {user.name}</p>
-                        <p><strong>Email:</strong> {user.email}</p>
-                        <lightning-button label="Editar" onclick={handleEdit} data-id={user.id} class="slds-m-right_small"></lightning-button>
-                        <lightning-button label="Excluir" onclick={handleDelete} data-id={user.id}></lightning-button>
+                <div class="slds-scrollable_x">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <template for:each={filteredUsers} for:item="user">
+                            <div key={user.id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-5 slds-p-around_medium user-card">
+                                <div class="slds-box slds-theme_shade">
+                                    <p><strong>Id:</strong> {user.id}</p>
+                                    <p><strong>Nome:</strong> {user.name}</p>
+                                    <p><strong>Email:</strong> {user.email}</p>
+                                    <div class="slds-grid slds-m-top_small">
+                                        <lightning-button
+                                            variant="brand"
+                                            label="Editar"
+                                            onclick={handleEdit}
+                                            data-id={user.id}
+                                            class="slds-m-right_x-small"
+                                        ></lightning-button>
+                                        <lightning-button
+                                            variant="destructive"
+                                            label="Excluir"
+                                            onclick={handleDelete}
+                                            data-id={user.id}
+                                        ></lightning-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
-                </template>
+                </div>
             </template>
             <template if:false={hasFilteredUsers}>
-                <p>Nenhum usuário encontrado.</p>
+                <p class="slds-text-color_weak">Nenhum usuário encontrado.</p>
             </template>
         </div>
     </lightning-card>
