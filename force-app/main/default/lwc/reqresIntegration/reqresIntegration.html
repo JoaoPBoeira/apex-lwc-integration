@@ -1,0 +1,40 @@
+<template>
+    <lightning-card title="Integração com ReqRes API">
+        <div class="slds-m-around_medium">
+            <lightning-input
+                type="search"
+                label="Pesquisar Usuários"
+                placeholder="Digite nome ou email..."
+                onchange={handleSearch}
+            ></lightning-input>
+        </div>
+
+        <div class="slds-m-around_medium">
+            <h3>{formTitle}</h3>
+            <lightning-input label="Nome" value={newUserName} onchange={handleNameChange}></lightning-input>
+            <lightning-input label="Email" value={newUserEmail} onchange={handleEmailChange}></lightning-input>
+            <lightning-button label={formButtonLabel} onclick={handleSubmit} class="slds-m-top_small"></lightning-button>
+            <template if:true={isEditing}>
+                <lightning-button label="Cancelar" onclick={cancelEdit} class="slds-m-top_small slds-m-left_small"></lightning-button>
+            </template>
+        </div>
+
+        <div class="slds-m-around_medium">
+            <h3>Lista de Usuários</h3>
+            <template if:true={hasFilteredUsers}>
+                <template for:each={filteredUsers} for:item="user">
+                    <div key={user.id} class="slds-box slds-m-bottom_small">
+                        <p><strong>Id:</strong> {user.id}</p>
+                        <p><strong>Nome:</strong> {user.name}</p>
+                        <p><strong>Email:</strong> {user.email}</p>
+                        <lightning-button label="Editar" onclick={handleEdit} data-id={user.id} class="slds-m-right_small"></lightning-button>
+                        <lightning-button label="Excluir" onclick={handleDelete} data-id={user.id}></lightning-button>
+                    </div>
+                </template>
+            </template>
+            <template if:false={hasFilteredUsers}>
+                <p>Nenhum usuário encontrado.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>
